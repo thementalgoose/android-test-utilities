@@ -2,7 +2,7 @@ package tmg.testutils.livedata
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.*
 import tmg.utilities.lifecycle.DataEvent
 import tmg.utilities.lifecycle.Event
 
@@ -53,8 +53,8 @@ class LiveDataTestScope<T>(
      *  the live data matches exactly
      */
     fun assertValue(expected: T) {
-        Assertions.assertNotNull(latestValue)
-        Assertions.assertEquals(expected, latestValue)
+        assertNotNull(latestValue)
+        assertEquals(expected, latestValue)
     }
 
     /**
@@ -62,11 +62,11 @@ class LiveDataTestScope<T>(
      *  the given position matches what is expected
      */
     fun assertValueAt(expected: T, position: Int) {
-        Assertions.assertTrue(
+        assertTrue(
             listOfValues.size > position,
             "Number of items emitted is less than position requested (${listOfValues.size} > $position)"
         )
-        Assertions.assertEquals(expected, listOfValues[position])
+        assertEquals(expected, listOfValues[position])
     }
 
     /**
@@ -77,7 +77,7 @@ class LiveDataTestScope<T>(
         listOfValues.forEach {
             if (it == expected) { return }
         }
-        Assertions.assertFalse(
+        assertFalse(
             true,
             "All emitted items do not contain the expected item. $expected (${listOfValues.size} items emitted)"
         )
@@ -86,8 +86,8 @@ class LiveDataTestScope<T>(
     /**
      * Assert that the number of items emitted is equal to the expected value
      */
-    fun assertItemCount(expected: Int) {
-        Assertions.assertEquals(listOfValues.size, expected)
+    fun assertEmittedCount(expected: Int) {
+        assertEquals(expected, listOfValues.size)
     }
 
     /**
@@ -101,7 +101,7 @@ class LiveDataTestScope<T>(
      * Assert that the items emitted match the expected list
      */
     fun assertEmittedItems(expected: List<T>) {
-        Assertions.assertEquals(listOfValues, expected)
+        assertEquals(expected, listOfValues)
     }
 }
 
@@ -109,35 +109,43 @@ class LiveDataTestScope<T>(
 
 /**
  * Assert that an event has been fired in the latest value
+ * @param exactly The number of times you expect the event to be fired. Null = at least 1 event is fired
  */
-fun <T: Event> LiveDataTestScope<T>.assertEventFired() {
-    Assertions.assertNotNull(latestValue)
+fun <T: Event> LiveDataTestScope<T>.assertEventFired(exactly: Int? = null) {
+    exactly?.let {
+        assertEquals(exactly, listOfValues.size, "Expected $exactly items to be emitted. Actually, ${listOfValues.size} was emitted")
+    }
+    assertNotNull(latestValue)
 }
 
 /**
  * Assert that an event has not been fired
  */
 fun <T: Event> LiveDataTestScope<T>.assertEventNotFired() {
-    Assertions.assertNull(latestValue)
+    assertNull(latestValue)
 }
 
 /**
  * Assert that a data event item has been fired
  *  and that the data contains the item
+ * @param expected The item expected to be emitted
+ * @param atIndex The index of the value you are asserting against. Default to first (0)
  */
-fun <T> LiveDataTestScope<DataEvent<T>>.assertDataEventValue(expected: T) {
+fun <T> LiveDataTestScope<DataEvent<T>>.assertDataEventValue(expected: T, atIndex: Int = 0) {
     assertEventFired()
-    Assertions.assertEquals(expected, latestValue!!.data)
+    assertEquals(expected, listOfValues[atIndex].data)
 }
 
 /**
  * Assert that a data event item has been fired
  *  and that the data contains the item
+ * @param atIndex The index of the value you are asserting against. Default to first (0)
+ * @param predicate Method to determine if item matches enough
  */
-fun <T> LiveDataTestScope<DataEvent<T>>.assertDataEventMatches(predicate: (item: T) -> Boolean) {
+fun <T> LiveDataTestScope<DataEvent<T>>.assertDataEventMatches(atIndex: Int = 0, predicate: (item: T) -> Boolean) {
     assertEventFired()
-    Assertions.assertTrue(
-        predicate(latestValue!!.data),
+    assertTrue(
+        predicate(listOfValues[atIndex].data),
         "Item emitted does not match the predicate"
     )
 }
@@ -145,13 +153,6 @@ fun <T> LiveDataTestScope<DataEvent<T>>.assertDataEventMatches(predicate: (item:
 //endregion
 
 //region LiveDataTestScope<List<T>>
-
-/**
- * If the scope allows nullable values, check that the item exposed is null
- */
-fun <T> LiveDataTestScope<T?>.assertValueNull() {
-    Assertions.assertNull(latestValue)
-}
 
 /**
  * Assert that given the subject is a list that only one list has been
@@ -164,25 +165,33 @@ fun <T> LiveDataTestScope<List<T>>.assertListContainsItems(vararg item: T) {
 /**
  * Assert that given the subject is a list that only one list has been
  *  emitted and the list contains the following item
+ * @param item the list of items to include within a list
+ * @param atIndex The index in the emitted item in the live data
  */
-fun <T> LiveDataTestScope<List<T>>.assertListContainsItems(item: List<T>) {
+fun <T> LiveDataTestScope<List<T>>.assertListContainsItems(item: List<T>, atIndex: Int = 0) {
+    if (item.isEmpty()) {
+        assertValue(emptyList())
+    }
     item.forEach {
-        assertListContainsItem(it)
+        assertListContainsItem(it, atIndex)
     }
 }
 
 /**
  * Assert that given the subject is a list that only one list has been
  *  emitted and the list contains the following item
+ * @param item The item to check is within a list
+ * @param atIndex The index in the emitted item in the live data
  */
-fun <T> LiveDataTestScope<List<T>>.assertListContainsItem(item: T) {
-    Assertions.assertNotNull(latestValue)
-    latestValue!!.forEach {
+fun <T> LiveDataTestScope<List<T>>.assertListContainsItem(item: T, atIndex: Int = 0) {
+    assertTrue(atIndex < listOfValues.size, "Index is out of bounds")
+    assertNotNull(listOfValues[atIndex])
+    listOfValues[atIndex].forEach {
         if (it == item) return
     }
-    Assertions.assertFalse(
+    assertFalse(
         true,
-        "List does not contain the expected item - $item (${latestValue!!.size} items)"
+        "List does not contain the expected item - $item (${listOfValues[atIndex].size} items)"
     )
 }
 
@@ -190,14 +199,15 @@ fun <T> LiveDataTestScope<List<T>>.assertListContainsItem(item: T) {
  * Assert that given the subject is a list that only one list has been
  *  emitted and the list contains the following item
  */
-fun <T> LiveDataTestScope<List<T>>.assertListMatchesItem(predicate: (item: T) -> Boolean) {
-    Assertions.assertNotNull(latestValue)
-    latestValue!!.forEach {
+fun <T> LiveDataTestScope<List<T>>.assertListMatchesItem(atIndex: Int = 0, predicate: (item: T) -> Boolean) {
+    assertTrue(atIndex < listOfValues.size, "Index is out of bounds")
+    assertNotNull(listOfValues[atIndex])
+    listOfValues[atIndex].forEach {
         if (predicate(it)) return
     }
-    Assertions.assertFalse(
+    assertFalse(
         true,
-        "List does not contain an item that matches the predicate - (${latestValue!!.size} items)"
+        "List does not contain an item that matches the predicate - (${listOfValues[atIndex].size} items)"
     )
 }
 
@@ -205,15 +215,16 @@ fun <T> LiveDataTestScope<List<T>>.assertListMatchesItem(predicate: (item: T) ->
  * Assert that given the subject is a list that only one list has been
  *  emitted and the list contains the following item
  */
-fun <T> LiveDataTestScope<List<T>>.assertListDoesNotMatchItem(predicate: (item: T) -> Boolean) {
-    Assertions.assertNotNull(latestValue)
+fun <T> LiveDataTestScope<List<T>>.assertListDoesNotMatchItem(atIndex: Int = 0, predicate: (item: T) -> Boolean) {
+    assertTrue(atIndex < listOfValues.size, "Index is out of bounds")
+    assertNotNull(listOfValues[atIndex])
     var assertionValue = false
-    latestValue!!.forEach {
+    listOfValues[atIndex].forEach {
         if (predicate(it)) assertionValue = true
     }
-    Assertions.assertFalse(
+    assertFalse(
         assertionValue,
-        "List does contains an item that matches the predicate - (${latestValue!!.size} items)"
+        "List does contains an item that matches the predicate - (${listOfValues[atIndex].size} items)"
     )
 }
 
@@ -221,57 +232,54 @@ fun <T> LiveDataTestScope<List<T>>.assertListDoesNotMatchItem(predicate: (item: 
  * Assert that given the subject is a list that only one list has been
  *  emitted and the list contains the following item
  */
-fun <T> LiveDataTestScope<List<T>>.assertListExcludesItem(item: T) {
-    Assertions.assertNotNull(latestValue)
-    latestValue!!.forEach {
-        if (it != item) return
-    }
-    Assertions.assertFalse(
-        true,
-        "List contains an item that matches the predicate when exclusion is required - $item (${latestValue!!.size} items)"
-    )
+fun <T> LiveDataTestScope<List<T>>.assertListExcludesItem(item: T, atIndex: Int = 0) {
+    return assertListDoesNotMatchItem(atIndex = atIndex) { it == item }
 }
 
 /**
  * Assert that the latest value emitted contains 0 items
  */
-fun <T> LiveDataTestScope<List<T>>.assertListNotEmpty() {
-    Assertions.assertNotNull(latestValue)
-    Assertions.assertTrue(latestValue!!.isNotEmpty(), "List contains 0 items")
+fun <T> LiveDataTestScope<List<T>>.assertListNotEmpty(atIndex: Int = 0) {
+    assertTrue(atIndex < listOfValues.size, "Index is out of bounds")
+    assertNotNull(listOfValues[atIndex])
+    assertTrue(listOfValues[atIndex].isNotEmpty(), "List contains 0 items")
 }
 
 /**
  * Assert that the last item in the latest value emitted is equal to this item
  */
-fun <T> LiveDataTestScope<List<T>>.assertListHasLastItem(item: T) {
-    Assertions.assertNotNull(latestValue)
-    Assertions.assertEquals(item, latestValue!!.last())
+fun <T> LiveDataTestScope<List<T>>.assertListHasLastItem(item: T, atIndex: Int = 0) {
+    assertTrue(atIndex < listOfValues.size, "Index is out of bounds")
+    assertNotNull(listOfValues[atIndex])
+    assertEquals(item, listOfValues[atIndex].last())
 }
 
 /**
  * Assert that the first item in the latest value emitted is equal to this item
  */
-fun <T> LiveDataTestScope<List<T>>.assertListHasFirstItem(item: T) {
-    Assertions.assertNotNull(latestValue)
-    Assertions.assertEquals(item, latestValue!!.first())
+fun <T> LiveDataTestScope<List<T>>.assertListHasFirstItem(item: T, atIndex: Int = 0) {
+    assertTrue(atIndex < listOfValues.size, "Index is out of bounds")
+    assertNotNull(listOfValues[atIndex])
+    assertEquals(item, listOfValues[atIndex].first())
 }
 
 /**
  * Assert that the list in the latest value contains this sublist of items in the order specified
  */
-fun <T> LiveDataTestScope<List<T>>.assertListHasSublist(list: List<T>) {
-    Assertions.assertNotNull(latestValue)
-    Assertions.assertTrue(
+fun <T> LiveDataTestScope<List<T>>.assertListHasSublist(list: List<T>, atIndex: Int = 0) {
+    assertTrue(atIndex < listOfValues.size, "Index is out of bounds")
+    assertNotNull(listOfValues[atIndex])
+    assertTrue(
         list.isNotEmpty(),
         "Expected list is empty, which will match any value. Consider changing your assertion"
     )
-    val filter = latestValue!!.filter { list.contains(it) }
-    Assertions.assertEquals(
+    val filter = listOfValues[atIndex].filter { list.contains(it) }
+    assertEquals(
         filter.size,
         list.size,
         "Expected list of size ${list.size} but can only find ${filter.size} items in common"
     )
-    Assertions.assertEquals(filter, list)
+    assertEquals(filter, list)
 }
 
 //endregion
