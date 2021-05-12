@@ -556,4 +556,309 @@ internal class LiveDataTestScopeTest: BaseTest() {
             }
         }
     }
+
+    @Nested
+    inner class assertListDoesNotMatchItem {
+
+        @Test
+        fun `throws exception when live data is empty`() {
+            initSUT()
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListDoesNotMatchItem { true }
+                }
+            }
+        }
+
+        @Test
+        fun `throws exception when live data contains item`() {
+            initSUT()
+            sut.liveDataList.value = listOf(Model("a"), Model("b"))
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListDoesNotMatchItem { it == Model("a") }
+                }
+            }
+        }
+
+        @Test
+        fun `throws exception when live data contains in different list`() {
+            initSUT()
+            val observer = sut.liveDataList.testObserve()
+            sut.liveDataList.value = listOf(Model("a"), Model("b"))
+            sut.liveDataList.value = listOf(Model("b"), Model("c"))
+            assertThrows<AssertionError> {
+                observer.assertListDoesNotMatchItem(atIndex = 0) {
+                    it == Model("a")
+                }
+            }
+        }
+
+        @Test
+        fun `does not throw exception if list does not contain item`() {
+            initSUT()
+            val observer = sut.liveDataList.testObserve()
+            sut.liveDataList.value = listOf(Model("a"), Model("b"))
+            sut.liveDataList.value = listOf(Model("b"), Model("c"))
+            observer.assertListDoesNotMatchItem {
+                it == Model("c")
+            }
+        }
+
+        @Test
+        fun `does not throw exception if list does not contain item at given index`() {
+            initSUT()
+            val observer = sut.liveDataList.testObserve()
+            sut.liveDataList.value = listOf(Model("a"), Model("b"))
+            sut.liveDataList.value = listOf(Model("b"), Model("c"))
+            observer.assertListDoesNotMatchItem(atIndex = 1) {
+                it == Model("a")
+            }
+        }
+    }
+
+    @Nested
+    inner class assertListExcludesItem {
+
+        @Test
+        fun `throws exception when live data is empty`() {
+            initSUT()
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListExcludesItem(Model("a"))
+                }
+            }
+        }
+
+        @Test
+        fun `throws exception when live data contains item`() {
+            initSUT()
+            sut.liveDataList.value = listOf(Model("a"), Model("b"))
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListExcludesItem(Model("a"))
+                }
+            }
+        }
+
+        @Test
+        fun `throws exception when live data contains in different list`() {
+            initSUT()
+            val observer = sut.liveDataList.testObserve()
+            sut.liveDataList.value = listOf(Model("a"), Model("b"))
+            sut.liveDataList.value = listOf(Model("b"), Model("c"))
+            assertThrows<AssertionError> {
+                observer.assertListExcludesItem(Model("a"), atIndex = 0)
+            }
+        }
+
+        @Test
+        fun `does not throw exception if list does not contain item`() {
+            initSUT()
+            val observer = sut.liveDataList.testObserve()
+            sut.liveDataList.value = listOf(Model("a"), Model("b"))
+            sut.liveDataList.value = listOf(Model("b"), Model("c"))
+            observer.assertListExcludesItem(Model("c"))
+        }
+
+        @Test
+        fun `does not throw exception if list does not contain item at given index`() {
+            initSUT()
+            val observer = sut.liveDataList.testObserve()
+            sut.liveDataList.value = listOf(Model("a"), Model("b"))
+            sut.liveDataList.value = listOf(Model("b"), Model("c"))
+            observer.assertListExcludesItem(Model("a"), atIndex = 1)
+        }
+    }
+
+    @Nested
+    inner class assertListNotEmpty {
+
+        @Test
+        fun `throws exception when live data values are empty`() {
+            initSUT()
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListNotEmpty()
+                }
+            }
+        }
+
+        @Test
+        fun `throws exception when list is empty`() {
+            initSUT()
+            sut.liveDataList.value = emptyList()
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListNotEmpty()
+                }
+            }
+        }
+
+        @Test
+        fun `does not throw exception when list is not empty`() {
+            initSUT()
+            sut.liveDataList.value = listOf(Model("a"))
+            sut.liveDataList.test {
+                assertListNotEmpty()
+            }
+        }
+    }
+
+    @Nested
+    inner class assertListHasLastItem {
+
+        @Test
+        fun `throws exception when live data values are empty`() {
+            initSUT()
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListHasLastItem(Model("a"))
+                }
+            }
+        }
+
+        @Test
+        fun `throws exception when list doesnt contain item`() {
+            initSUT()
+            sut.liveDataList.value = listOf(Model("1"), Model("2"), Model("3"))
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListHasLastItem(Model("4"))
+                }
+            }
+        }
+
+        @Test
+        fun `throws exception when list contains item but isnt last`() {
+            initSUT()
+            sut.liveDataList.value = listOf(Model("1"), Model("2"), Model("3"))
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListHasLastItem(Model("2"))
+                }
+            }
+        }
+
+        @Test
+        fun `does not throw exception when list contains item at last position`() {
+            initSUT()
+            sut.liveDataList.value = listOf(Model("1"), Model("2"), Model("3"))
+            sut.liveDataList.test {
+                assertListHasLastItem(Model("3"))
+            }
+        }
+    }
+
+    @Nested
+    inner class assertListHasFirstItem {
+
+        @Test
+        fun `throws exception when live data values are empty`() {
+            initSUT()
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListHasFirstItem(Model("a"))
+                }
+            }
+        }
+
+        @Test
+        fun `throws exception when list doesnt contain item`() {
+            initSUT()
+            sut.liveDataList.value = listOf(Model("1"), Model("2"), Model("3"))
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListHasFirstItem(Model("4"))
+                }
+            }
+        }
+
+        @Test
+        fun `throws exception when list contains item but isnt last`() {
+            initSUT()
+            sut.liveDataList.value = listOf(Model("1"), Model("2"), Model("3"))
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListHasFirstItem(Model("2"))
+                }
+            }
+        }
+
+        @Test
+        fun `does not throw exception when list contains item at last position`() {
+            initSUT()
+            sut.liveDataList.value = listOf(Model("1"), Model("2"), Model("3"))
+            sut.liveDataList.test {
+                assertListHasFirstItem(Model("1"))
+            }
+        }
+    }
+
+    @Nested
+    inner class assertListHasSublist {
+
+        @Test
+        fun `throws exception when live data values are empty`() {
+            initSUT()
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListHasSublist(listOf(Model("a")))
+                }
+            }
+        }
+
+        @Test
+        fun `throws exception when list contains no items`() {
+            initSUT()
+            sut.liveDataList.value = emptyList()
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListHasSublist(listOf(Model("a")))
+                }
+            }
+        }
+
+        @Test
+        fun `throws exception when list only contains some items in sublist`() {
+            initSUT()
+            sut.liveDataList.value = listOf(Model("a"), Model("b"), Model("c"))
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListHasSublist(listOf(Model("a"), Model("d")))
+                }
+            }
+        }
+
+        @Test
+        fun `throws exception when list contains same items but not in order`() {
+            initSUT()
+            sut.liveDataList.value = listOf(Model("a"), Model("b"), Model("c"))
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListHasSublist(listOf(Model("b"), Model("a")))
+                }
+            }
+        }
+
+        @Test
+        fun `throws exception when sublist is empty`() {
+            initSUT()
+            sut.liveDataList.value = listOf(Model("a"), Model("b"), Model("c"))
+            assertThrows<AssertionError> {
+                sut.liveDataList.test {
+                    assertListHasSublist(emptyList())
+                }
+            }
+        }
+
+        @Test
+        fun `does not throw exception when sublist is contained`() {
+            initSUT()
+            sut.liveDataList.value = listOf(Model("a"), Model("b"), Model("c"))
+            sut.liveDataList.test {
+                assertListHasSublist(listOf(Model("a"), Model("c")))
+            }
+        }
+    }
 }

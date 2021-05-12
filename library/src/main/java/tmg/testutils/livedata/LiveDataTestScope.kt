@@ -215,15 +215,16 @@ fun <T> LiveDataTestScope<List<T>>.assertListMatchesItem(atIndex: Int = 0, predi
  * Assert that given the subject is a list that only one list has been
  *  emitted and the list contains the following item
  */
-fun <T> LiveDataTestScope<List<T>>.assertListDoesNotMatchItem(predicate: (item: T) -> Boolean) {
-    assertNotNull(latestValue)
+fun <T> LiveDataTestScope<List<T>>.assertListDoesNotMatchItem(atIndex: Int = 0, predicate: (item: T) -> Boolean) {
+    assertTrue(atIndex < listOfValues.size, "Index is out of bounds")
+    assertNotNull(listOfValues[atIndex])
     var assertionValue = false
-    latestValue!!.forEach {
+    listOfValues[atIndex].forEach {
         if (predicate(it)) assertionValue = true
     }
     assertFalse(
         assertionValue,
-        "List does contains an item that matches the predicate - (${latestValue!!.size} items)"
+        "List does contains an item that matches the predicate - (${listOfValues[atIndex].size} items)"
     )
 }
 
@@ -231,51 +232,48 @@ fun <T> LiveDataTestScope<List<T>>.assertListDoesNotMatchItem(predicate: (item: 
  * Assert that given the subject is a list that only one list has been
  *  emitted and the list contains the following item
  */
-fun <T> LiveDataTestScope<List<T>>.assertListExcludesItem(item: T) {
-    assertNotNull(latestValue)
-    latestValue!!.forEach {
-        if (it != item) return
-    }
-    assertFalse(
-        true,
-        "List contains an item that matches the predicate when exclusion is required - $item (${latestValue!!.size} items)"
-    )
+fun <T> LiveDataTestScope<List<T>>.assertListExcludesItem(item: T, atIndex: Int = 0) {
+    return assertListDoesNotMatchItem(atIndex = atIndex) { it == item }
 }
 
 /**
  * Assert that the latest value emitted contains 0 items
  */
-fun <T> LiveDataTestScope<List<T>>.assertListNotEmpty() {
-    assertNotNull(latestValue)
-    assertTrue(latestValue!!.isNotEmpty(), "List contains 0 items")
+fun <T> LiveDataTestScope<List<T>>.assertListNotEmpty(atIndex: Int = 0) {
+    assertTrue(atIndex < listOfValues.size, "Index is out of bounds")
+    assertNotNull(listOfValues[atIndex])
+    assertTrue(listOfValues[atIndex].isNotEmpty(), "List contains 0 items")
 }
 
 /**
  * Assert that the last item in the latest value emitted is equal to this item
  */
-fun <T> LiveDataTestScope<List<T>>.assertListHasLastItem(item: T) {
-    assertNotNull(latestValue)
-    assertEquals(item, latestValue!!.last())
+fun <T> LiveDataTestScope<List<T>>.assertListHasLastItem(item: T, atIndex: Int = 0) {
+    assertTrue(atIndex < listOfValues.size, "Index is out of bounds")
+    assertNotNull(listOfValues[atIndex])
+    assertEquals(item, listOfValues[atIndex].last())
 }
 
 /**
  * Assert that the first item in the latest value emitted is equal to this item
  */
-fun <T> LiveDataTestScope<List<T>>.assertListHasFirstItem(item: T) {
-    assertNotNull(latestValue)
-    assertEquals(item, latestValue!!.first())
+fun <T> LiveDataTestScope<List<T>>.assertListHasFirstItem(item: T, atIndex: Int = 0) {
+    assertTrue(atIndex < listOfValues.size, "Index is out of bounds")
+    assertNotNull(listOfValues[atIndex])
+    assertEquals(item, listOfValues[atIndex].first())
 }
 
 /**
  * Assert that the list in the latest value contains this sublist of items in the order specified
  */
-fun <T> LiveDataTestScope<List<T>>.assertListHasSublist(list: List<T>) {
-    assertNotNull(latestValue)
+fun <T> LiveDataTestScope<List<T>>.assertListHasSublist(list: List<T>, atIndex: Int = 0) {
+    assertTrue(atIndex < listOfValues.size, "Index is out of bounds")
+    assertNotNull(listOfValues[atIndex])
     assertTrue(
         list.isNotEmpty(),
         "Expected list is empty, which will match any value. Consider changing your assertion"
     )
-    val filter = latestValue!!.filter { list.contains(it) }
+    val filter = listOfValues[atIndex].filter { list.contains(it) }
     assertEquals(
         filter.size,
         list.size,
