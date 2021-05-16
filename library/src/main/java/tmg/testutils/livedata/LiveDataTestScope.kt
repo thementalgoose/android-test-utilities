@@ -53,7 +53,7 @@ class LiveDataTestScope<T>(
      *  the live data matches exactly
      */
     fun assertValue(expected: T) {
-        assertNotNull(latestValue)
+        assertTrue(listOfValues.size >= 1, "No value found at latest position")
         assertEquals(expected, latestValue)
     }
 

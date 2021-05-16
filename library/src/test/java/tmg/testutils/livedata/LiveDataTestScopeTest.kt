@@ -58,12 +58,33 @@ internal class LiveDataTestScopeTest: BaseTest() {
         }
 
         @Test
+        fun `throws equal exception if no item has emitted yet value supports null`() {
+            initSUT()
+            assertThrows<AssertionError> {
+                sut.liveDataNullable.test {
+                    assertValue(Model("my-id"))
+                }
+            }
+        }
+
+        @Test
         fun `doesnt throw error when models match`() {
             initSUT()
             sut.liveData.value = Model("hey")
             assertDoesNotThrow {
                 sut.liveData.test {
                     assertValue(Model("hey"))
+                }
+            }
+        }
+
+        @Test
+        fun `doesnt throw error when model is null but is explicitly assigned`() {
+            initSUT()
+            sut.liveDataNullable.value = null
+            assertDoesNotThrow {
+                sut.liveDataNullable.test {
+                    assertValue(null)
                 }
             }
         }
