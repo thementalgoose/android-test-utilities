@@ -21,7 +21,7 @@ Contains BaseTest, Coroutine rules and live data testing methods
     <summary><code>app/build.gradle</code></summary>
 
     dependencies {
-        testImplementation 'com.github.thementalgoose:android-test-utilities:1.0.0'
+        testImplementation 'com.github.thementalgoose:android-test-utilities:1.1.0'
         // Use Jitpack version if newer
     }
 
