@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer
 import org.junit.jupiter.api.Assertions.*
 import tmg.utilities.lifecycle.DataEvent
 import tmg.utilities.lifecycle.Event
+import tmg.utilities.lifecycle.SingleLiveEvent
 
 
 /**
@@ -32,8 +33,11 @@ fun <T> LiveData<T>.testObserve(): LiveDataTestScope<T> {
  * Live data testing scope class
  */
 class LiveDataTestScope<T>(
-    liveData: LiveData<T>
+    private val liveData: LiveData<T>
 ): Observer<T> {
+
+    val isSingleLiveEvent: Boolean
+        get() = liveData is SingleLiveEvent<*>
 
     val listOfValues: MutableList<T> = mutableListOf()
 
@@ -52,21 +56,39 @@ class LiveDataTestScope<T>(
      * Assert that the latest value emitted matches
      *  the live data matches exactly
      */
-    fun assertValue(expected: T) {
-        assertTrue(listOfValues.size >= 1, "No value found at latest position")
-        assertEquals(expected, latestValue)
+    fun assertValue(expected: T, atIndex: Int = 0) {
+        assertTrue(
+            listOfValues.size > atIndex,
+            "Number of items emitted is less than position requested (${listOfValues.size} > $atIndex)"
+        )
+        assertEquals(expected, listOfValues[atIndex])
+    }
+
+    /**
+     * Assert that the latest value matches a predicate
+     */
+    fun assertValueMatches(atIndex: Int = 0, predicate: (T) -> Boolean) {
+        assertTrue(predicate(listOfValues[atIndex]!!), "Value $latestValue did not match predicate")
+    }
+
+    /**
+     * Assert that the latest value emitted matches
+     *  the live data matches exactly
+     */
+    fun assertNoValues() {
+        assertEquals(0, listOfValues.size, "Expected no values but was actually ${listOfValues.size}")
     }
 
     /**
      * Given a number of items have been emitted, assert that the value at
      *  the given position matches what is expected
      */
+    @Deprecated(
+        message = "Please use assertValue(, atIndex = 0)",
+        replaceWith = ReplaceWith("assertValue(, atIndex = )")
+    )
     fun assertValueAt(expected: T, position: Int) {
-        assertTrue(
-            listOfValues.size > position,
-            "Number of items emitted is less than position requested (${listOfValues.size} > $position)"
-        )
-        assertEquals(expected, listOfValues[position])
+        assertValue(atIndex = position, expected = expected)
     }
 
     /**
@@ -105,12 +127,32 @@ class LiveDataTestScope<T>(
     }
 }
 
+//region LiveDataTestScope<Unit>
+
+/**
+ * Assert that on SingleLiveEvent<Unit> live data type that we get an event fired
+ * @param exactly The number of times you expect the event to be fired. Null = at least 1 event is fired
+ */
+fun LiveDataTestScope<Unit>.assertFired(exactly: Int? = null) {
+    assertTrue(this.isSingleLiveEvent, "Calling .assertFired() is only supported on SingleLiveEvent")
+    exactly?.let {
+        assertEquals(exactly, listOfValues.size, "Expected $exactly items to be emitted. Actually, ${listOfValues.size} was emitted")
+    }
+    assertNotNull(latestValue)
+}
+
+//endregion
+
 //region LiveDataTestScope<Event>
 
 /**
  * Assert that an event has been fired in the latest value
  * @param exactly The number of times you expect the event to be fired. Null = at least 1 event is fired
  */
+@Deprecated(
+    message = "Usage of Event is discouraged, please use SingleLiveEvent to handle events in the UI",
+    level = DeprecationLevel.WARNING
+)
 fun <T: Event> LiveDataTestScope<T>.assertEventFired(exactly: Int? = null) {
     exactly?.let {
         assertEquals(exactly, listOfValues.size, "Expected $exactly items to be emitted. Actually, ${listOfValues.size} was emitted")
@@ -121,6 +163,11 @@ fun <T: Event> LiveDataTestScope<T>.assertEventFired(exactly: Int? = null) {
 /**
  * Assert that an event has not been fired
  */
+@Deprecated(
+    message = "Usage of Event is discouraged, please use SingleLiveEvent to handle events in the UI",
+    level = DeprecationLevel.WARNING,
+    replaceWith = ReplaceWith("assertNoValues()")
+)
 fun <T: Event> LiveDataTestScope<T>.assertEventNotFired() {
     assertNull(latestValue)
 }
@@ -131,6 +178,11 @@ fun <T: Event> LiveDataTestScope<T>.assertEventNotFired() {
  * @param expected The item expected to be emitted
  * @param atIndex The index of the value you are asserting against. Default to first (0)
  */
+@Deprecated(
+    message = "Usage of Event is discouraged, please use SingleLiveEvent to handle events in the UI",
+    level = DeprecationLevel.WARNING,
+    replaceWith = ReplaceWith("assertValue()")
+)
 fun <T> LiveDataTestScope<DataEvent<T>>.assertDataEventValue(expected: T, atIndex: Int = 0) {
     assertEventFired()
     assertEquals(expected, listOfValues[atIndex].data)
@@ -142,6 +194,11 @@ fun <T> LiveDataTestScope<DataEvent<T>>.assertDataEventValue(expected: T, atInde
  * @param atIndex The index of the value you are asserting against. Default to first (0)
  * @param predicate Method to determine if item matches enough
  */
+@Deprecated(
+    message = "Usage of Event is discouraged, please use SingleLiveEvent to handle events in the UI",
+    level = DeprecationLevel.WARNING,
+    replaceWith = ReplaceWith("assertValueMatches { }")
+)
 fun <T> LiveDataTestScope<DataEvent<T>>.assertDataEventMatches(atIndex: Int = 0, predicate: (item: T) -> Boolean) {
     assertEventFired()
     assertTrue(
