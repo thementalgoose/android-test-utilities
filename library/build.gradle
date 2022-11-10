@@ -78,7 +78,7 @@ android {
 }
 
 dependencies {
-    implementation "com.github.thementalgoose:android-utilities:2.4.4"
+    implementation "com.github.thementalgoose:android-utilities:2.4.5"
 
     implementation "org.junit.jupiter:junit-jupiter-api:$junit"
     implementation "org.junit.jupiter:junit-jupiter-engine:$junit"
