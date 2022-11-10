@@ -1,24 +1,23 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
 apply plugin: "de.mannodermaus.android-junit5"
 
 repositories {
     mavenCentral()
     google()
-    jcenter()
     maven { url "https://jitpack.io" }
 }
 
 group = 'com.github.thementalgoose'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
 
@@ -79,8 +78,7 @@ android {
 }
 
 dependencies {
-
-    implementation "com.github.thementalgoose:android-utilities:2.2.0"
+    implementation "com.github.thementalgoose:android-utilities:2.4.4"
 
     implementation "org.junit.jupiter:junit-jupiter-api:$junit"
     implementation "org.junit.jupiter:junit-jupiter-engine:$junit"
@@ -89,7 +87,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
-    implementation 'androidx.test:core:1.4.0'
+    implementation 'androidx.test:core:1.5.0'
     implementation 'androidx.arch.core:core-testing:2.1.0'
 
     // Lifecycle

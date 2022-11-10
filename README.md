@@ -21,7 +21,7 @@ Contains BaseTest, Coroutine rules and live data testing methods
     <summary><code>app/build.gradle</code></summary>
 
     dependencies {
-        testImplementation 'com.github.thementalgoose:android-test-utilities:1.1.0'
+        testImplementation 'com.github.thementalgoose:android-test-utilities:1.2.0'
         // Use Jitpack version if newer
     }
 
@@ -59,7 +59,7 @@ internal class MyTest: BaseTest() {
 ## License
 
 ```
-Copyright (C) 2021 Jordan Fisher
+Copyright (C) 2022 Jordan Fisher
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
