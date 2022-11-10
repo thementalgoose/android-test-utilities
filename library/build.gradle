@@ -78,6 +78,8 @@ android {
 }
 
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
     implementation "com.github.thementalgoose:android-utilities:2.4.5"
 
     implementation "org.junit.jupiter:junit-jupiter-api:$junit"
@@ -93,4 +95,19 @@ dependencies {
     // Lifecycle
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$android_lifecycle"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$android_lifecycle"
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+project.afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+            }
+        }
+    }
 }
