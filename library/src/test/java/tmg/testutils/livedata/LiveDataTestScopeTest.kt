@@ -1,10 +1,8 @@
 package tmg.testutils.livedata
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -140,7 +138,7 @@ internal class LiveDataTestScopeTest: BaseTest() {
             sut.liveData.value = Model("b")
             assertThrows<AssertionError> {
                 sut.liveData.test {
-                    assertValueExists(Model("c"))
+                    assertValueWasEmitted(Model("c"))
                 }
             }
         }
@@ -152,8 +150,8 @@ internal class LiveDataTestScopeTest: BaseTest() {
             sut.liveData.value = Model("b")
             assertThrows<AssertionError> {
                 sut.liveData.test {
-                    assertValueExists(Model("a"))
-                    assertValueExists(Model("b"))
+                    assertValueWasEmitted(Model("a"))
+                    assertValueWasEmitted(Model("b"))
                 }
             }
         }

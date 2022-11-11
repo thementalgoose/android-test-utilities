@@ -56,12 +56,12 @@ class LiveDataTestScope<T>(
      * Assert that the latest value emitted matches
      *  the live data matches exactly
      */
-    fun assertValue(expected: T, atIndex: Int = 0) {
+    fun assertValue(expected: T, atIndex: Int? = null) {
         assertTrue(
-            listOfValues.size > atIndex,
+            listOfValues.size > (atIndex ?: 0),
             "Number of items emitted is less than position requested (${listOfValues.size} > $atIndex)"
         )
-        assertEquals(expected, listOfValues[atIndex])
+        assertEquals(expected, atIndex?.let { listOfValues[it] } ?: latestValue)
     }
 
     /**
@@ -95,7 +95,7 @@ class LiveDataTestScope<T>(
      * Assert that of any of the values that have been emitted that one of them
      *  is the expected item
      */
-    fun assertValueExists(expected: T) {
+    fun assertValueWasEmitted(expected: T) {
         listOfValues.forEach {
             if (it == expected) { return }
         }
@@ -103,6 +103,13 @@ class LiveDataTestScope<T>(
             true,
             "All emitted items do not contain the expected item. $expected (${listOfValues.size} items emitted)"
         )
+    }
+    @Deprecated(
+        message = "Method has been renamed, please use assertValueWasEmitted(expected: T)",
+        replaceWith = ReplaceWith("assertValueWasEmitted")
+    )
+    fun assertValueExists(expected: T) {
+        assertValueWasEmitted(expected)
     }
 
     /**
