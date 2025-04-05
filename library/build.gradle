@@ -13,11 +13,13 @@ repositories {
 group = 'com.github.thementalgoose'
 
 android {
-    compileSdkVersion 33
+    compileSdk 35
+
+    namespace "tmg.testutils"
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 33
+        targetSdkVersion 35
         versionCode 1
         versionName "1.0"
 
@@ -25,24 +27,20 @@ android {
         consumerProguardFiles 'consumer-rules.pro'
     }
 
-    buildFeatures {
-        viewBinding true
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     sourceSets {
@@ -75,31 +73,32 @@ android {
             }
         }
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation "com.github.thementalgoose:android-utilities:2.4.5"
+    implementation libs.tmg.android.utils
 
-    implementation "org.junit.jupiter:junit-jupiter-api:$junit"
-    implementation "org.junit.jupiter:junit-jupiter-engine:$junit"
-    implementation "org.junit.jupiter:junit-jupiter-params:$junit"
-    runtimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
-    implementation 'androidx.test:core:1.5.0'
-    implementation 'androidx.arch.core:core-testing:2.1.0'
+    implementation libs.junit.api
+    implementation libs.junit.engine
+    implementation libs.junit.params
+    runtimeOnly libs.junit.engine
+    implementation libs.kotlin.reflect
+    implementation libs.kotlinx.coroutine.core
+    implementation libs.kotlinx.coroutine.test
+    implementation libs.androidx.test.core
+    implementation libs.androidx.test.arch.core
 
-    // Lifecycle
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$android_lifecycle"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$android_lifecycle"
-}
-
-task androidSourcesJar(type: Jar) {
-    classifier 'sources'
-    from android.sourceSets.main.java.srcDirs
+    implementation libs.androidx.lifecycle.livedata
+    implementation libs.androidx.lifecycle.viewmodel
 }
 
 project.afterEvaluate {
