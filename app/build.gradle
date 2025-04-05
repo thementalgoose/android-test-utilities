@@ -5,6 +5,8 @@ apply plugin: "de.mannodermaus.android-junit5"
 android {
     compileSdk 35
 
+    namespace "tmg.testutils.sample"
+
     defaultConfig {
         applicationId "tmg.testutils.sample"
         minSdkVersion 24
@@ -29,7 +31,6 @@ android {
         jvmTarget = '1.8'
     }
 
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -45,26 +46,4 @@ dependencies {
 
     // Test dependency
     testImplementation project(path: ':library')
-
-    // Utilities
-    implementation "com.github.thementalgoose:android-utilities:2.4.5"
-
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit"
-    testImplementation "org.junit.jupiter:junit-jupiter-engine:$junit"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:$junit"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit"
-
-    // Navigation
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
-    implementation 'com.google.android.material:material:1.7.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    // Lifecycle
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$android_lifecycle"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$android_lifecycle"
 }

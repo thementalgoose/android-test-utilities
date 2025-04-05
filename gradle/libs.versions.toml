@@ -1,0 +1,28 @@
+[versions]  # ===========================================================================
+kotlin = "2.1.20"
+androidx_lifecycle = "2.8.7"
+coroutines = "1.8.0"
+junit = "5.12.1"
+
+[libraries]  # ===========================================================================
+android_gradle_plugin = "com.android.tools.build:gradle:8.9.1"
+kotlin_gradle_plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+android_junit5_plugin = "de.mannodermaus.gradle.plugins:android-junit5:1.12.0.0"
+
+androidx_lifecycle_viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx_lifecycle" }
+androidx_lifecycle_livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx_lifecycle" }
+
+androidx_test_core = "androidx.test:core:1.6.1"
+androidx_test_arch_core = "androidx.arch.core:core-testing:2.2.0"
+
+junit_api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit_engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit_params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+
+kotlin_reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+
+kotlinx_coroutine_core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx_coroutine_test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+
+tmg_android_utils = "com.github.thementalgoose:android-utilities:2.8.0"
+
