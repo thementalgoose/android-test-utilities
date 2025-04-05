@@ -27,8 +27,11 @@ android {
         consumerProguardFiles 'consumer-rules.pro'
     }
 
-    buildFeatures {
-        viewBinding true
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
     }
 
     compileOptions {
@@ -72,7 +75,10 @@ android {
     }
 
     publishing {
-        singleVariant("release")
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
     }
 }
 
@@ -84,7 +90,7 @@ dependencies {
     implementation libs.junit.api
     implementation libs.junit.engine
     implementation libs.junit.params
-    runtimeOnly libs.junit.api
+    runtimeOnly libs.junit.engine
     implementation libs.kotlin.reflect
     implementation libs.kotlinx.coroutine.core
     implementation libs.kotlinx.coroutine.test
